@@ -1,7 +1,11 @@
 library(binancer)
+library(jsonlite)
+library(logger)
+library(checkmate) # adding validations
+log_threshold(TRACE)
+
 print(paste0('Value of .42 Bitcoins is $', round(0.42 * binance_coins_prices()[symbol == 'BTC']$usd, 2)))
 
-library(jsonlite)
 # in HUF: fromJSON("https://api.exchangeratesapi.io/latest?symbols=USD,HUF")$rates$HUF api call
 print(paste0('Value of .42 Bitcoins is HUF ', round(0.42 * binance_coins_prices()[symbol == 'BTC']$usd * (fromJSON("https://api.exchangeratesapi.io/latest?base=USD&symbols=HUF")$rates$HUF), 0)))
 
@@ -10,7 +14,6 @@ fromJSON(readLines('https://api.exchangeratesapi.io/latest?base=USD'))
 
 
 # making script more efficient
-library(logger)
 
 BITCOINS <- 0.42
 log_info('Number of Bitcoins: {BITCOINS}') 
@@ -34,13 +37,12 @@ get_bitcoin_price <- function() {
 
 btcusdt <- get_bitcoin_price()
 log_info('Value of 1 BTC in USDT is: {btcusdt}') 
-# lets assert if it is a number
-library(checkmate) # adding validations
-assert_number(btcusdt, lower = 1000)
+# log_eval(btcusdt) # evaluate expression and log results
+assert_number(btcusdt, lower = 1000) # lets assert if it is a number
 
 usdhuf <- fromJSON("https://api.exchangeratesapi.io/latest?base=USD&symbols=HUF")$rates$HUF
 log_info('Value of 1 USD in HUF is: {usdhuf}')
 assert_number(usdhuf, lower = 250, upper = 500)
 
 
-BITCOINS * btcusdt * usdhuf
+log_eval(BITCOINS * btcusdt * usdhuf) # TODO formatting
