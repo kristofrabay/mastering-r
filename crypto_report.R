@@ -15,8 +15,26 @@ library(logger)
 BITCOINS <- 0.42
 log_info('Number of Bitcoins: {BITCOINS}') 
 
-## TODO the Binance API is a bit of a mess .. need to add retries
-btcusdt <- binance_coins_prices()[symbol == 'BTC']$usd
+
+# while (TRUE) {
+#   tryCatch(binance_coins_prices()[symbol == 'BTC']$usd,
+#            error = function(e) {
+#              binance_coins_prices()[symbol == 'BTC']$usd
+#            })
+#   
+#   break
+# }
+
+
+# function to call itself
+
+get_bitcoin_price <- function() {
+  tryCatch(binance_coins_prices()[symbol == 'BTC']$usd,
+           error = function (e) {get_bitcoin_price()})
+}
+
+
+btcusdt <- get_bitcoin_price()
 log_info('Value of 1 BTC in USDT is: {btcusdt}') 
 
 usdhuf <- fromJSON("https://api.exchangeratesapi.io/latest?base=USD&symbols=HUF")$rates$HUF
